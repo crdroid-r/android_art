@@ -1050,6 +1050,7 @@ class Heap {
       REQUIRES_SHARED(Locks::mutator_lock_);
 
   mirror::Object* AllocWithNewTLAB(Thread* self,
+                                   AllocatorType allocator_type,
                                    size_t alloc_size,
                                    bool grow,
                                    size_t* bytes_allocated,
