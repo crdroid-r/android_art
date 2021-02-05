@@ -182,7 +182,7 @@ bool ClassTable::Remove(const char* descriptor) {
   return false;
 }
 
-uint32_t ClassTable::ClassDescriptorHashEquals::operator()(const TableSlot& slot)
+uint32_t ClassTable::ClassDescriptorHash::operator()(const TableSlot& slot)
     const {
   std::string temp;
   // No read barrier needed, we're reading a chain of constant references for comparison
@@ -190,8 +190,12 @@ uint32_t ClassTable::ClassDescriptorHashEquals::operator()(const TableSlot& slot
   return ComputeModifiedUtf8Hash(slot.Read<kWithoutReadBarrier>()->GetDescriptor(&temp));
 }
 
-bool ClassTable::ClassDescriptorHashEquals::operator()(const TableSlot& a,
-                                                       const TableSlot& b) const {
+uint32_t ClassTable::ClassDescriptorHash::operator()(const DescriptorHashPair& pair) const {
+  DCHECK_EQ(ComputeModifiedUtf8Hash(pair.first), pair.second);
+  return pair.second;
+}
+
+bool ClassTable::ClassDescriptorEquals::operator()(const TableSlot& a, const TableSlot& b) const {
   // No read barrier needed, we're reading a chain of constant references for comparison
   // with null and retrieval of constant primitive data. See ReadBarrierOption.
   if (a.Hash() != b.Hash()) {
@@ -205,8 +209,8 @@ bool ClassTable::ClassDescriptorHashEquals::operator()(const TableSlot& a,
       b.Read<kWithoutReadBarrier>()->GetDescriptor(&temp));
 }
 
-bool ClassTable::ClassDescriptorHashEquals::operator()(const TableSlot& a,
-                                                       const DescriptorHashPair& b) const {
+bool ClassTable::ClassDescriptorEquals::operator()(const TableSlot& a,
+                                                   const DescriptorHashPair& b) const {
   // No read barrier needed, we're reading a chain of constant references for comparison
   // with null and retrieval of constant primitive data. See ReadBarrierOption.
   if (!a.MaskedHashEquals(b.second)) {
@@ -214,10 +218,6 @@ bool ClassTable::ClassDescriptorHashEquals::operator()(const TableSlot& a,
     return false;
   }
   return a.Read<kWithoutReadBarrier>()->DescriptorEquals(b.first);
-}
-
-uint32_t ClassTable::ClassDescriptorHashEquals::operator()(const DescriptorHashPair& pair) const {
-  return ComputeModifiedUtf8Hash(pair.first);
 }
 
 bool ClassTable::InsertStrongRoot(ObjPtr<mirror::Object> obj) {
