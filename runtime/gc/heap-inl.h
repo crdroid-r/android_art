@@ -207,7 +207,7 @@ inline mirror::Object* Heap::AllocObjectWithAllocator(Thread* self,
           && UNLIKELY(ShouldConcurrentGCForJava(new_num_bytes_allocated))) {
         need_gc = true;
       }
-      GetMetrics()->TotalBytesAllocated()->Add(bytes_tl_bulk_allocated);
+      //GetMetrics()->TotalBytesAllocated()->Add(bytes_tl_bulk_allocated);
     }
   }
   if (kIsDebugBuild && Runtime::Current()->IsStarted()) {
