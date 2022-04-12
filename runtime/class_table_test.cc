@@ -137,12 +137,7 @@ TEST_F(ClassTableTest, ClassTable) {
   });
   EXPECT_EQ(classes.size(), 1u);
 
-  // Test remove.
-  table.Remove(descriptor_x);
-  EXPECT_TRUE(table.LookupByDescriptor(h_X.Get()) == nullptr);
-
-  // Test that WriteToMemory and ReadFromMemory work.
-  table.Insert(h_X.Get());
+  // Test that reading a class set from memory works.
   const size_t count = table.WriteToMemory(nullptr);
   std::unique_ptr<uint8_t[]> buffer(new uint8_t[count]());
   ASSERT_EQ(table.WriteToMemory(&buffer[0]), count);
