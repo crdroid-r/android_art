@@ -96,8 +96,8 @@ $$(core_image_name): $$(HOST_CORE_DEX_LOCATIONS) $$(core_dex2oat_dependency)
 	  --instruction-set=$$($(2)ART_HOST_ARCH) \
 	  $$(LOCAL_$(2)DEX2OAT_HOST_INSTRUCTION_SET_FEATURES_OPTION) \
 	  --host --android-root=$$(HOST_OUT) \
-	  --generate-debug-info --generate-build-id \
-	  --runtime-arg -XX:SlowDebug=true \
+	  --generate-build-id \
+	  --runtime-arg -XX:SlowDebug=false \
 	  --no-inline-from=core-oj-hostdex.jar \
 	  $$(PRIVATE_CORE_COMPILE_OPTIONS) && \
 	ANDROID_LOG_TAGS="*:e" $$(DEX2OAT) \
@@ -118,7 +118,7 @@ $$(core_image_name): $$(HOST_CORE_DEX_LOCATIONS) $$(core_dex2oat_dependency)
 	  --instruction-set=$$($(2)ART_HOST_ARCH) \
 	  $$(LOCAL_$(2)DEX2OAT_HOST_INSTRUCTION_SET_FEATURES_OPTION) \
 	  --host --android-root=$$(HOST_OUT) \
-	  --generate-debug-info --generate-build-id \
+	  --generate-build-id \
 	  --runtime-arg -XX:SlowDebug=false \
 	  --no-inline-from=core-oj-hostdex.jar \
 	  $$(PRIVATE_CORE_COMPILE_OPTIONS)
@@ -213,8 +213,8 @@ $$(core_image_name): $$(TARGET_CORE_DEX_FILES) $$(core_dex2oat_dependency)
 	  --instruction-set-variant=$$($(2)DEX2OAT_TARGET_CPU_VARIANT) \
 	  --instruction-set-features=$$($(2)DEX2OAT_TARGET_INSTRUCTION_SET_FEATURES) \
 	  --android-root=$$(PRODUCT_OUT)/system \
-	  --generate-debug-info --generate-build-id \
-	  --runtime-arg -XX:SlowDebug=true \
+	  --generate-build-id \
+	  --runtime-arg -XX:SlowDebug=false \
 	  $$(PRIVATE_CORE_COMPILE_OPTIONS) && \
 	$$(DEX2OAT) \
 	  --runtime-arg -Xms$(DEX2OAT_IMAGE_XMS) \
@@ -235,7 +235,7 @@ $$(core_image_name): $$(TARGET_CORE_DEX_FILES) $$(core_dex2oat_dependency)
 	  --instruction-set-variant=$$($(2)DEX2OAT_TARGET_CPU_VARIANT) \
 	  --instruction-set-features=$$($(2)DEX2OAT_TARGET_INSTRUCTION_SET_FEATURES) \
 	  --android-root=$$(PRODUCT_OUT)/system \
-	  --generate-debug-info --generate-build-id \
+	  --generate-build-id \
 	  --runtime-arg -XX:SlowDebug=false \
 	  $$(PRIVATE_CORE_COMPILE_OPTIONS) || \
 	(rm $$(PRIVATE_CORE_OAT_NAME); exit 1)

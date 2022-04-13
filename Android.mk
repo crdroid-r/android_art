@@ -305,26 +305,19 @@ include $(CLEAR_VARS)
 art_target_include_debug_build := $(PRODUCT_ART_TARGET_INCLUDE_DEBUG_BUILD)
 ifneq (false,$(art_target_include_debug_build))
   ifneq (,$(filter eng,$(TARGET_BUILD_VARIANT)))
-    art_target_include_debug_build := true
+    art_target_include_debug_build := false
   endif
 endif
-ifeq (true,$(art_target_include_debug_build))
-  # Module with both release and debug variants, as well as
-  # additional tools.
-  TARGET_ART_APEX := $(DEBUG_ART_APEX)
-  APEX_TEST_MODULE := art-check-debug-apex-gen-fakebin
-else
-  # Release module (without debug variants nor tools).
-  TARGET_ART_APEX := $(RELEASE_ART_APEX)
-  APEX_TEST_MODULE := art-check-release-apex-gen-fakebin
-endif
+# Release module (without debug variants nor tools).
+TARGET_ART_APEX := $(RELEASE_ART_APEX)
+APEX_TEST_MODULE := art-check-release-apex-gen-fakebin
 
 LOCAL_MODULE := com.android.art
 LOCAL_REQUIRED_MODULES := $(TARGET_ART_APEX)
 LOCAL_REQUIRED_MODULES += art_apex_boot_integrity
 
 # Clear locally used variable.
-art_target_include_debug_build :=
+art_target_include_debug_build := false
 
 include $(BUILD_PHONY_PACKAGE)
 
@@ -392,21 +385,7 @@ LOCAL_REQUIRED_MODULES := \
 art_target_include_debug_build := $(PRODUCT_ART_TARGET_INCLUDE_DEBUG_BUILD)
 ifneq (false,$(art_target_include_debug_build))
 ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
-  art_target_include_debug_build := true
-endif
-ifeq (true,$(art_target_include_debug_build))
-LOCAL_REQUIRED_MODULES += \
-    dex2oatd.com.android.art.debug \
-    dexoptanalyzerd.com.android.art.debug \
-    libartd.com.android.art.debug \
-    libartd-compiler.com.android.art.debug \
-    libopenjdkd.com.android.art.debug \
-    libopenjdkjvmd.com.android.art.debug \
-    libopenjdkjvmtid.com.android.art.debug \
-    profmand.com.android.art.debug \
-    libadbconnectiond.com.android.art.debug \
-    libperfetto_hprofd.com.android.art.debug \
-
+  art_target_include_debug_build := false
 endif
 endif
 
