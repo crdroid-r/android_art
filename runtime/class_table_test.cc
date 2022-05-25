@@ -100,9 +100,12 @@ TEST_F(ClassTableTest, ClassTable) {
 
   // Test inserting and related lookup functions.
   EXPECT_TRUE(table.LookupByDescriptor(h_Y.Get()) == nullptr);
+  EXPECT_FALSE(table.Contains(h_Y.Get()));
   table.Insert(h_Y.Get());
   EXPECT_OBJ_PTR_EQ(table.LookupByDescriptor(h_X.Get()), h_X.Get());
   EXPECT_OBJ_PTR_EQ(table.LookupByDescriptor(h_Y.Get()), h_Y.Get());
+  EXPECT_TRUE(table.Contains(h_X.Get()));
+  EXPECT_TRUE(table.Contains(h_Y.Get()));
 
   EXPECT_EQ(table.NumZygoteClasses(class_loader.Get()), 1u);
   EXPECT_EQ(table.NumNonZygoteClasses(class_loader.Get()), 1u);
@@ -137,7 +140,11 @@ TEST_F(ClassTableTest, ClassTable) {
   });
   EXPECT_EQ(classes.size(), 1u);
 
-  // Test that reading a class set from memory works.
+  table.Remove(descriptor_x);
+  EXPECT_FALSE(table.Contains(h_X.Get()));
+
+  // Test that WriteToMemory and ReadFromMemory work.
+  table.Insert(h_X.Get());
   const size_t count = table.WriteToMemory(nullptr);
   std::unique_ptr<uint8_t[]> buffer(new uint8_t[count]());
   ASSERT_EQ(table.WriteToMemory(&buffer[0]), count);
@@ -145,8 +152,8 @@ TEST_F(ClassTableTest, ClassTable) {
   size_t count2 = table2.ReadFromMemory(&buffer[0]);
   EXPECT_EQ(count, count2);
   // Strong roots are not serialized, only classes.
-  EXPECT_OBJ_PTR_EQ(table2.LookupByDescriptor(h_X.Get()), h_X.Get());
-  EXPECT_OBJ_PTR_EQ(table2.LookupByDescriptor(h_Y.Get()), h_Y.Get());
+  EXPECT_TRUE(table2.Contains(h_X.Get()));
+  EXPECT_TRUE(table2.Contains(h_Y.Get()));
 
   // TODO: Add tests for UpdateClass, InsertOatFile.
 }

@@ -33,6 +33,22 @@ void ClassTable::FreezeSnapshot() {
   classes_.push_back(ClassSet());
 }
 
+bool ClassTable::Contains(ObjPtr<mirror::Class> klass) {
+  return LookupByDescriptor(klass) == klass;
+}
+
+ObjPtr<mirror::Class> ClassTable::LookupByDescriptor(ObjPtr<mirror::Class> klass) {
+  ReaderMutexLock mu(Thread::Current(), lock_);
+  TableSlot slot(klass);
+  for (ClassSet& class_set : classes_) {
+    auto it = class_set.find(slot);
+    if (it != class_set.end()) {
+      return it->Read();
+    }
+  }
+  return nullptr;
+}
+
 ObjPtr<mirror::Class> ClassTable::UpdateClass(const char* descriptor,
                                               ObjPtr<mirror::Class> klass,
                                               size_t hash) {
@@ -111,8 +127,23 @@ ObjPtr<mirror::Class> ClassTable::Lookup(const char* descriptor, size_t hash) {
   return nullptr;
 }
 
+ObjPtr<mirror::Class> ClassTable::TryInsert(ObjPtr<mirror::Class> klass) {
+  TableSlot slot(klass);
+  WriterMutexLock mu(Thread::Current(), lock_);
+  for (ClassSet& class_set : classes_) {
+    auto it = class_set.find(slot);
+    if (it != class_set.end()) {
+      return it->Read();
+    }
+  }
+  classes_.back().insert(slot);
+  return klass;
+}
+
 void ClassTable::Insert(ObjPtr<mirror::Class> klass) {
-  InsertWithHash(klass, TableSlot::HashDescriptor(klass));
+  const uint32_t hash = TableSlot::HashDescriptor(klass);
+  WriterMutexLock mu(Thread::Current(), lock_);
+  classes_.back().InsertWithHash(TableSlot(klass, hash), hash);
 }
 
 void ClassTable::CopyWithoutLocks(const ClassTable& source_table) {
