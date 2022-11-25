@@ -278,7 +278,6 @@ void ThrowIncompatibleClassChangeErrorClassForInterfaceSuper(ArtMethod* method,
       << "' does not implement interface '" << mirror::Class::PrettyDescriptor(target_class)
       << "' in call to '"
       << ArtMethod::PrettyMethod(method) << "'";
-  DumpB77342775DebugData(target_class, this_object->GetClass());
   ThrowException("Ljava/lang/IncompatibleClassChangeError;",
                  referrer != nullptr ? referrer->GetDeclaringClass() : nullptr,
                  msg.str().c_str());
